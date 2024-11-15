@@ -1,0 +1,85 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;1,700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <h1 id="gameName">Welcome to Dragon's World</h1>
+  <div class="container">
+    <button onclick="restart()" class="design">Restart</button>
+    <div class="gameover" style="visibility: hidden;">Game Over</div>
+    <div id="scorecount">Your score: 0</div>
+    <div class="obstacle animateobstacle"></div>
+    <div class="dragon" style="left: 426px;"></div>
+  </div>
+  <script>
+    let cross = true;
+    let score = 0;
+    const dragon = document.querySelector('.dragon');
+    const gameover = document.querySelector('.gameover');
+    const obstacle = document.querySelector('.obstacle');
+    const scorecount = document.getElementById('scorecount');
+
+    document.onkeydown = function (e) {
+      switch (e.keyCode) {
+        case 38: // Up arrow
+          dragon.classList.add('animatedragon');
+          setTimeout(() => {
+            dragon.classList.remove('animatedragon');
+          }, 700);
+          break;
+        case 37: // Left arrow
+          moveDragon(-112);
+          break;
+        case 39: // Right arrow
+          moveDragon(112);
+          break;
+      }
+    };
+
+    function moveDragon(offset) {
+      const dragonx = parseInt(window.getComputedStyle(dragon, null).getPropertyValue('left'));
+      dragon.style.left = (dragonx + offset) + "px";
+    }
+
+    setInterval(() => {
+      const dx = parseInt(window.getComputedStyle(dragon, null).getPropertyValue('left'));
+      const dy = parseInt(window.getComputedStyle(dragon, null).getPropertyValue('bottom'));
+      const ox = parseInt(window.getComputedStyle(obstacle, null).getPropertyValue('left'));
+      const oy = parseInt(window.getComputedStyle(obstacle, null).getPropertyValue('bottom'));
+
+      const offsetx = Math.abs(dx - ox);
+      const offsety = Math.abs(dy - oy);
+
+      if (offsetx < 120 && offsety <= 144) {
+        gameover.style.visibility = 'visible';
+        obstacle.classList.remove('animateobstacle');
+        updateScore(score); // Update score display even on game over
+      } else if (offsetx < 125 && cross) {
+        score++;
+        updateScore(score);
+        cross = false;
+        setTimeout(() => {
+          cross = true;
+        }, 1000);
+        increaseObstacleSpeed();
+      }
+    }, 10);
+
+    function updateScore(score) {
+      scorecount.innerHTML = "Your score: " + score;
+    }
+
+    function increaseObstacleSpeed() {
+      const obsanidur = parseFloat(window.getComputedStyle(obstacle, null).getPropertyValue('animation-duration'));
+      obstacle.style.animationDuration = (obsanidur - 0.01) + 's';
+    }
+
+    function restart() {
+      window.location.reload();
+    }
+  </script>
+</body>
